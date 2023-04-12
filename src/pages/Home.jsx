@@ -19,13 +19,15 @@ const Home = () => {
   // const [expenseName, setExpenseName] = useState<string>('');
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // console.log('---------------------');
   // console.log(categoryStatus);
   // console.log('---------------------');
   console.log('RENDER');
-  console.log(minPrice, 'min price render');
-  console.log(expenseArray);
+  // console.log(minPrice, 'min price render');
+  // console.log(expenseArray);
+  console.log(currentPage, 'current page render');
 
   const getExpenseData = async () => {
     console.log('fetch data!', categoryIdSelect);
@@ -40,7 +42,7 @@ const Home = () => {
     await fetch(
       `${
         CONFIG.API_URL
-      }/expenses?page=${1}&limit=${4}${categoryParam}${minPriceParam}${maxPriceParam}`
+      }/expenses?page=${currentPage}&limit=${4}${categoryParam}${minPriceParam}${maxPriceParam}`
     )
       .then((res) => res.json())
       .then((resJson) =>
@@ -79,17 +81,19 @@ const Home = () => {
 
     console.log('MIN PRICE BEFORE SET', minPrice);
     setMinPrice(newValue);
+    setCurrentPage(1);
     console.log('MIN PRICE AFTER SET', minPrice);
   };
 
   const handleMaxChange = (event) => {
     const newValue = parseInt(event.target.value) || 0;
     setMaxPrice(newValue);
+    setCurrentPage(1);
   };
 
   useEffect(() => {
     getExpenseData();
-  }, [categoryIdSelect, minPrice, maxPrice]);
+  }, [categoryIdSelect, minPrice, maxPrice, currentPage]);
 
   fetch(`${CONFIG.API_URL}/expenses/category`)
     .then((res) => res.json())
@@ -110,16 +114,37 @@ const Home = () => {
     const leftArrow = '<';
     const rightArrow = '>';
 
+    const handlePagination = (paginationText) => {
+      if (
+        typeof paginationText == 'string' &&
+        (paginationText == '<' || paginationText == '>')
+      ) {
+        console.log('arrow');
+      } else if (typeof paginationText == 'number') {
+        console.log('hello');
+        setCurrentPage(paginationText);
+      }
+    };
+
     if (expenseResponse.paging.pageCount > 5) {
       const secondLastPage = expenseResponse.paging.pageCount - 1;
       const firstLastPage = expenseResponse.paging.pageCount;
 
-      return ['1', '2', '...', secondLastPage, firstLastPage, rightArrow].map(
+      return [1, 2, '...', secondLastPage, firstLastPage, rightArrow].map(
         (text, index) => {
+          let pageStyle = null;
+
+          if (expenseResponse.paging.page == text) {
+            pageStyle = 'btn-dark';
+          } else {
+            pageStyle = 'btn-light';
+          }
+
           return (
             <button
               key={index}
-              className='btn btn-light pagination-btn text-center'
+              className={`btn ${pageStyle} pagination-btn text-center`}
+              onClick={() => handlePagination(text)}
             >
               {text}
             </button>
@@ -128,7 +153,7 @@ const Home = () => {
       );
     } else if (expenseResponse.paging.pageCount == 1) {
       return (
-        <button className='btn btn-light pagination-btn text-center'>1</button>
+        <button className='btn btn-dark pagination-btn text-center'>1</button>
       );
     } else {
       console.log('PGINATION 5 KEBAWAH DAN BUKAN 1');
@@ -141,10 +166,18 @@ const Home = () => {
       paginationArray.push('>');
 
       return paginationArray.map((text, index) => {
+        let pageStyle = null;
+
+        if (expenseResponse.paging.page == text) {
+          pageStyle = 'btn-dark';
+        } else {
+          pageStyle = 'btn-light';
+        }
+
         return (
           <button
             key={index}
-            className='btn btn-light pagination-btn text-center'
+            className={`btn ${pageStyle} pagination-btn text-center`}
           >
             {text}
           </button>
@@ -207,6 +240,7 @@ const Home = () => {
                   // handleCheckbox(categoryName);
                   console.log(categoryIds[index]);
                   setCategoryIdSelect(categoryIds[index]);
+                  setCurrentPage(1);
                 }}
               >
                 {/* {categoryStatus[categoryName.toLocaleLowerCase()] ||

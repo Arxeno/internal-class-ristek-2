@@ -50,7 +50,7 @@ input {
 
 #main-app {
   display: grid;
-  grid-template-rows: 118px auto auto;
+  grid-template-rows: 118px 374px auto;
   grid-template-columns: 2fr 1.4fr;
   grid-template-areas: 'expense-card current-expense' 'expense-card filters' 'pagination pagination';
   row-gap: 10px;
@@ -131,8 +131,8 @@ input {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 90%;
-    max-width: 250px;
+    // width: 90%;
+    // max-width: 250px;
     margin: auto;
     text-align: center;
     column-gap: 10px;
