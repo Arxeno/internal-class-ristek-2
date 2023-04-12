@@ -1,0 +1,145 @@
+input {
+  border-radius: 5px;
+  border-width: 1px;
+}
+
+.emoji {
+  font-size: 4rem;
+}
+
+.expense-card {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: 'emoji category money' 'emoji name money';
+  align-items: center;
+  justify-content: center;
+  // margin: 10px;
+  column-gap: 10px;
+  width: 90%;
+  min-width: 500px;
+  max-width: 700px;
+  max-height: 118px;
+  text-align: left;
+
+  p {
+    margin: 0;
+  }
+
+  .emoji {
+    grid-area: emoji;
+  }
+
+  .category {
+    grid-area: category;
+  }
+
+  .name {
+    grid-area: name;
+  }
+
+  .money {
+    grid-area: money;
+    font-size: 1.5rem;
+  }
+}
+
+.container {
+  padding: 10px;
+}
+
+#main-app {
+  display: grid;
+  grid-template-rows: 118px auto auto;
+  grid-template-columns: 2fr 1.4fr;
+  grid-template-areas: 'expense-card current-expense' 'expense-card filters' 'pagination pagination';
+  row-gap: 10px;
+  column-gap: 10px;
+  width: 90%;
+  min-width: 800px;
+  margin: auto;
+
+  .card-container {
+    grid-area: expense-card;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    row-gap: 10px;
+  }
+
+  #category-filter {
+    label {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+
+      input[type='checkbox'] {
+        display: none;
+      }
+
+      // .checkbox-box-div {
+      //   display: block;
+      //   width: 1.25em;
+      //   height: 1.25em;
+      //   border: 1px solid $black;
+      //   margin: auto 0;
+      //   border-radius: 5px;
+      //   display: flex;
+      //   justify-content: center;
+      //   align-items: center;
+      // }
+
+      // input[type='checkbox']:checked + .checkbox-box-div {
+      //   background: $lime;
+      // }
+
+      // input[type='checkbox']:checked + .checkbox-box-div::after {
+      //   content: '\2714';
+      //   font-size: 0.8rem;
+      // }
+    }
+  }
+
+  #min-max-filter-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 80%;
+    margin: auto;
+
+    .min-max-flex {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      label {
+        font-size: 0.9rem;
+      }
+
+      .min-max-input-filter {
+        width: 75px;
+      }
+    }
+  }
+
+  #pagination-container {
+    grid-area: pagination;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 250px;
+    margin: auto;
+    text-align: center;
+    column-gap: 10px;
+
+    button.pagination-btn {
+      display: block;
+      // background-color: red;
+    }
+  }
+}
