@@ -110,60 +110,65 @@ const Home = () => {
       // console.log(categoryIds);
     });
 
+  const handlePagination = (paginationText) => {
+    if (
+      typeof paginationText == 'string' &&
+      (paginationText == '<' || paginationText == '>')
+    ) {
+      console.log('arrow');
+      switch (paginationText) {
+        case '<':
+          setCurrentPage(currentPage - 1);
+          break;
+        case '>':
+          setCurrentPage(currentPage + 1);
+          break;
+      }
+    } else if (typeof paginationText == 'number') {
+      console.log('hello');
+      setCurrentPage(paginationText);
+    }
+  };
+
   const createPaginationFiveAndMore = () => {
     const leftArrow = '<';
     const rightArrow = '>';
-
-    const handlePagination = (paginationText) => {
-      if (
-        typeof paginationText == 'string' &&
-        (paginationText == '<' || paginationText == '>')
-      ) {
-        console.log('arrow');
-      } else if (typeof paginationText == 'number') {
-        console.log('hello');
-        setCurrentPage(paginationText);
-      }
-    };
 
     if (expenseResponse.paging.pageCount > 5) {
       const secondLastPage = expenseResponse.paging.pageCount - 1;
       const firstLastPage = expenseResponse.paging.pageCount;
 
-      return [1, 2, '...', secondLastPage, firstLastPage, rightArrow].map(
-        (text, index) => {
-          let pageStyle = null;
+      let paginationArray = [];
+      if (
+        expenseResponse.paging.page == 1 ||
+        expenseResponse.paging.page == 2 ||
+        expenseResponse.paging.page == secondLastPage ||
+        expenseResponse.paging.page == firstLastPage
+      ) {
+        paginationArray = [1, 2, '...', secondLastPage, firstLastPage];
+      } else {
+        // paginationArray = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', secondLastPage, firstLastPage]
+        paginationArray.push(1);
 
-          if (expenseResponse.paging.page == text) {
-            pageStyle = 'btn-dark';
-          } else {
-            pageStyle = 'btn-light';
-          }
-
-          return (
-            <button
-              key={index}
-              className={`btn ${pageStyle} pagination-btn text-center`}
-              onClick={() => handlePagination(text)}
-            >
-              {text}
-            </button>
-          );
+        if (currentPage - 1 != 2) {
+          paginationArray.push('...');
         }
-      );
-    } else if (expenseResponse.paging.pageCount == 1) {
-      return (
-        <button className='btn btn-dark pagination-btn text-center'>1</button>
-      );
-    } else {
-      console.log('PGINATION 5 KEBAWAH DAN BUKAN 1');
-      const paginationArray = [];
 
-      for (let i = 1; i <= expenseResponse.paging.pageCount; i++) {
-        paginationArray.push(i);
+        paginationArray.push(currentPage - 1, currentPage, currentPage + 1);
+
+        if (currentPage + 1 != secondLastPage) {
+          paginationArray.push('...');
+        }
+
+        paginationArray.push(firstLastPage);
       }
 
-      paginationArray.push('>');
+      if (expenseResponse.paging.hasPreviousPage) {
+        paginationArray.unshift(leftArrow);
+      }
+      if (expenseResponse.paging.hasNextPage) {
+        paginationArray.push(rightArrow);
+      }
 
       return paginationArray.map((text, index) => {
         let pageStyle = null;
@@ -178,6 +183,45 @@ const Home = () => {
           <button
             key={index}
             className={`btn ${pageStyle} pagination-btn text-center`}
+            onClick={() => handlePagination(text)}
+          >
+            {text}
+          </button>
+        );
+      });
+    } else if (expenseResponse.paging.pageCount == 1) {
+      return (
+        <button className='btn btn-dark pagination-btn text-center'>1</button>
+      );
+    } else {
+      console.log('PGINATION 5 KEBAWAH DAN BUKAN 1');
+      const paginationArray = [];
+
+      for (let i = 1; i <= expenseResponse.paging.pageCount; i++) {
+        paginationArray.push(i);
+      }
+
+      if (expenseResponse.paging.hasPreviousPage) {
+        paginationArray.unshift(leftArrow);
+      }
+      if (expenseResponse.paging.hasNextPage) {
+        paginationArray.push(rightArrow);
+      }
+
+      return paginationArray.map((text, index) => {
+        let pageStyle = null;
+
+        if (expenseResponse.paging.page == text) {
+          pageStyle = 'btn-dark';
+        } else {
+          pageStyle = 'btn-light';
+        }
+
+        return (
+          <button
+            key={index}
+            className={`btn ${pageStyle} pagination-btn text-center`}
+            onClick={() => handlePagination(text)}
           >
             {text}
           </button>
