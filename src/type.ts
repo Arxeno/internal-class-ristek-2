@@ -23,3 +23,22 @@ export type ExpenseResponseType = {
 		hasNextPage: boolean
 	}
 }
+
+export type GlobalStateType = {
+  currentPage: {
+    state: number;
+    setState: (page: number) => void;
+  };
+  categoryIdSelect: {
+    state: string | null;
+    setState: (categoryId: string) => void;
+  };
+  minPrice: {
+    state: number;
+    setState: (x: number) => void;
+  };
+  maxPrice: {
+    state: number;
+    setState: (x: number) => void;
+  };
+}

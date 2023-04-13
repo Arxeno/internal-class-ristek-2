@@ -61,13 +61,21 @@ const ExpenseDetail = () => {
       });
   };
 
+  const linkStyle = {
+    color: 'black',
+    fontSize: '2rem',
+    fontWeight: 'bold',
+  };
+
   useEffect(() => {
     getDetailData();
   }, []);
 
   return (
     <div>
-      <Link to='/'>Back</Link>
+      <Link to='/' style={linkStyle}>
+        Back
+      </Link>
       <div id='expense-detail' className='card'>
         <h1 id='expense-name'>
           {emoji}

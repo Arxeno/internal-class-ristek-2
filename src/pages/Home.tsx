@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import CONFIG from '../config';
 import TotalExpense from '../components/TotalExpense';
 import Card from '../components/Card';
@@ -8,6 +8,7 @@ import {
   ExpenseType,
 } from '../type';
 import './Home.scss';
+import GlobalStateContext from '../GlobalStateContext';
 
 const categoryNames = [
   'Housing',
@@ -17,16 +18,19 @@ const categoryNames = [
 ];
 
 const Home = () => {
+  const { currentPage, categoryIdSelect, minPrice, maxPrice } =
+    useContext(GlobalStateContext);
+
   const [expenseResponse, setExpenseResponse] =
     useState<ExpenseResponseType | null>(null);
   const [expenseArray, setExpenseArray] = useState<ExpenseType[]>([]);
   // const [categoryStatus, setCategoryStatus] = useState(null);
-  const [categoryIdSelect, setCategoryIdSelect] = useState<string | null>(null);
-  let categoryIds = ['', '', '', ''];
+  // const [categoryIdSelect, setCategoryIdSelect] = useState<string | null>(null);
+  let [categoryIds, setCategoryIds] = useState(['', '', '', '']);
   // const [expenseName, setExpenseName] = useState<string>('');
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [minPrice, setMinPrice] = useState(0);
+  // const [maxPrice, setMaxPrice] = useState(0);
+  // const [currentPage, setCurrentPage] = useState(1);
 
   // console.log('---------------------');
   // console.log(categoryStatus);
@@ -34,22 +38,24 @@ const Home = () => {
   console.log('RENDER');
   // console.log(minPrice, 'min price render');
   // console.log(expenseArray);
-  console.log(currentPage, 'current page render');
+  // console.log(currentPage.state, 'current page render');
 
   const getExpenseData = async () => {
-    console.log('fetch data!', categoryIdSelect);
+    console.log('fetch data!', categoryIdSelect.state);
 
-    const categoryParam = categoryIdSelect
-      ? `&category_id=${categoryIdSelect}`
+    const categoryParam = categoryIdSelect.state
+      ? `&category_id=${categoryIdSelect.state}`
       : '';
 
-    const minPriceParam = minPrice > 0 ? `&min_price=${minPrice}` : '';
-    const maxPriceParam = maxPrice > 0 ? `&max_price=${maxPrice}` : '';
+    const minPriceParam =
+      minPrice.state > 0 ? `&min_price=${minPrice.state}` : '';
+    const maxPriceParam =
+      maxPrice.state > 0 ? `&max_price=${maxPrice.state}` : '';
 
     await fetch(
-      `${
-        CONFIG.API_URL
-      }/expenses?page=${currentPage}&limit=${4}${categoryParam}${minPriceParam}${maxPriceParam}`
+      `${CONFIG.API_URL}/expenses?page=${
+        currentPage.state
+      }&limit=${4}${categoryParam}${minPriceParam}${maxPriceParam}`
     )
       .then((res) => res.json())
       .then((resJson) =>
@@ -86,36 +92,48 @@ const Home = () => {
 
     console.log('VALUE', newValue);
 
-    console.log('MIN PRICE BEFORE SET', minPrice);
-    setMinPrice(newValue);
-    setCurrentPage(1);
-    console.log('MIN PRICE AFTER SET', minPrice);
+    console.log('MIN PRICE BEFORE SET', minPrice.state);
+    minPrice.setState(newValue);
+    currentPage.setState(1);
+    console.log('MIN PRICE AFTER SET', minPrice.state);
   };
 
   const handleMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(event.target.value) || 0;
-    setMaxPrice(newValue);
-    setCurrentPage(1);
+    maxPrice.setState(newValue);
+    currentPage.setState(1);
   };
 
   useEffect(() => {
     getExpenseData();
-  }, [categoryIdSelect, minPrice, maxPrice, currentPage]);
+  }, [
+    categoryIdSelect.state,
+    minPrice.state,
+    maxPrice.state,
+    currentPage.state,
+  ]);
 
-  fetch(`${CONFIG.API_URL}/expenses/category`)
-    .then((res) => res.json())
-    .then((resJson) => {
-      // console.log(resJson);
+  useEffect(() => {
+    fetch(`${CONFIG.API_URL}/expenses/category`)
+      .then((res) => res.json())
+      .then((resJson) => {
+        // console.log(resJson);
+        console.log('IDDDDD');
 
-      resJson.forEach((element: CategoryResponseType) => {
-        const index = categoryNames.indexOf(element.name);
-        // console.log(index, element.name, element.id);
+        resJson.forEach((element: CategoryResponseType) => {
+          const index = categoryNames.indexOf(element.name);
+          // console.log(index, element.name, element.id);
+          let temp = categoryIds;
 
-        categoryIds[index] = element.id;
+          temp[index] = element.id;
+          setCategoryIds(temp);
+        });
+
+        console.log(categoryIds);
+
+        // console.log(categoryIds);
       });
-
-      // console.log(categoryIds);
-    });
+  }, []);
 
   const handlePagination = (paginationText: number | string) => {
     if (
@@ -125,15 +143,15 @@ const Home = () => {
       console.log('arrow');
       switch (paginationText) {
         case '<':
-          setCurrentPage(currentPage - 1);
+          currentPage.setState(currentPage.state - 1);
           break;
         case '>':
-          setCurrentPage(currentPage + 1);
+          currentPage.setState(currentPage.state + 1);
           break;
       }
     } else if (typeof paginationText == 'number') {
       console.log('hello');
-      setCurrentPage(paginationText);
+      currentPage.setState(paginationText);
     }
   };
 
@@ -158,13 +176,17 @@ const Home = () => {
           // paginationArray = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', secondLastPage, firstLastPage]
           paginationArray.push(1);
 
-          if (currentPage - 1 != 2) {
+          if (currentPage.state - 1 != 2) {
             paginationArray.push('...');
           }
 
-          paginationArray.push(currentPage - 1, currentPage, currentPage + 1);
+          paginationArray.push(
+            currentPage.state - 1,
+            currentPage.state,
+            currentPage.state + 1
+          );
 
-          if (currentPage + 1 != secondLastPage) {
+          if (currentPage.state + 1 != secondLastPage) {
             paginationArray.push('...');
           }
 
@@ -285,39 +307,59 @@ const Home = () => {
                 break;
             }
 
-            return (
-              <label
-                key={index}
-                className='form-check-label'
-                onClick={() => {
-                  // handleCheckbox(categoryName);
-                  console.log(categoryIds[index]);
-                  setCategoryIdSelect(categoryIds[index]);
-                  setCurrentPage(1);
-                }}
-              >
-                {/* {categoryStatus[categoryName.toLocaleLowerCase()] ||
-                  categoryStatus[categoryName.toLocaleLowerCase()] === null ? (
-                    <input
-                      id={'radio-' + categoryName.toLowerCase()}
-                      className='form-check-input'
-                      type='radio'
-                    />
-                  ) : (
-                    <input
-                      id={'radio-' + categoryName.toLowerCase()}
-                      className='form-check-input'
-                      type='radio'
-                    />
-                  )} */}
-                <input
-                  className='form-check-input'
-                  type='radio'
-                  name='categoryName'
-                />
-                {emoji + categoryName}
-              </label>
-            );
+            console.log('HEHE', categoryIds[index], categoryIdSelect.state);
+
+            if (categoryIds[index] == categoryIdSelect.state) {
+              console.log(
+                'SAMA',
+                categoryName,
+                categoryIds[index],
+                categoryIdSelect.state
+              );
+
+              return (
+                <label
+                  key={index}
+                  className='form-check-label'
+                  onClick={() => {
+                    // handleCheckbox(categoryName);
+                    console.log(categoryIds[index]);
+                    categoryIdSelect.setState(categoryIds[index]);
+                    currentPage.setState(1);
+                  }}
+                >
+                  <input
+                    className='form-check-input'
+                    type='radio'
+                    name='categoryName'
+                    checked
+                  />
+                  {emoji + categoryName}
+                </label>
+              );
+            } else {
+              console.log('HALOOOOOOOWWWWWWWWWWWWWWWWWW');
+
+              return (
+                <label
+                  key={index}
+                  className='form-check-label'
+                  onClick={() => {
+                    // handleCheckbox(categoryName);
+                    console.log(categoryIds[index]);
+                    categoryIdSelect.setState(categoryIds[index]);
+                    currentPage.setState(1);
+                  }}
+                >
+                  <input
+                    className='form-check-input'
+                    type='radio'
+                    name='categoryName'
+                  />
+                  {emoji + categoryName}
+                </label>
+              );
+            }
           })}
 
           {/* <Checkbox
@@ -353,7 +395,7 @@ const Home = () => {
               <input
                 className='min-max-input-filter'
                 type='number'
-                value={minPrice}
+                value={minPrice.state}
                 onChange={handleMinChange}
               />
             </div>
@@ -363,7 +405,7 @@ const Home = () => {
               <input
                 className='min-max-input-filter'
                 type='number'
-                value={maxPrice}
+                value={maxPrice.state}
                 onChange={handleMaxChange}
               />
             </div>
