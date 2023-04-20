@@ -24,25 +24,9 @@ const Home = () => {
   const [expenseResponse, setExpenseResponse] =
     useState<ExpenseResponseType | null>(null);
   const [expenseArray, setExpenseArray] = useState<ExpenseType[]>([]);
-  // const [categoryStatus, setCategoryStatus] = useState(null);
-  // const [categoryIdSelect, setCategoryIdSelect] = useState<string | null>(null);
   let [categoryIds, setCategoryIds] = useState(['', '', '', '']);
-  // const [expenseName, setExpenseName] = useState<string>('');
-  // const [minPrice, setMinPrice] = useState(0);
-  // const [maxPrice, setMaxPrice] = useState(0);
-  // const [currentPage, setCurrentPage] = useState(1);
-
-  // console.log('---------------------');
-  // console.log(categoryStatus);
-  // console.log('---------------------');
-  console.log('RENDER');
-  // console.log(minPrice, 'min price render');
-  // console.log(expenseArray);
-  // console.log(currentPage.state, 'current page render');
 
   const getExpenseData = async () => {
-    console.log('fetch data!', categoryIdSelect.state);
-
     const categoryParam = categoryIdSelect.state
       ? `&category_id=${categoryIdSelect.state}`
       : '';
@@ -66,36 +50,11 @@ const Home = () => {
       );
   };
 
-  // const getExpenseName = async (id: string) => {
-  //   fetch(`${CONFIG.API_URL}/expenses/${id}`)
-  //     .then((res) => res.json())
-  //     .then((resJson) => setExpenseName(resJson.name));
-
-  //   // const res = await fetch(`${CONFIG.API_URL}/expenses/${id}`);
-  //   // const resJson = await res.json();
-  // };
-
-  // const handleCheckbox = (text: string) => {
-  //   let temp = categoryStatus;
-
-  //   temp[text.toLowerCase()] = !temp[text.toLowerCase()];
-
-  //   setCategoryStatus(temp);
-  //   console.log(categoryStatus);
-  //   getExpenseData();
-  // };
-
   const handleMinChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log('TYPE EVENT TARGET VALUE', typeof event.target.value);
-
     const newValue = parseInt(event.target.value) || 0;
 
-    console.log('VALUE', newValue);
-
-    console.log('MIN PRICE BEFORE SET', minPrice.state);
     minPrice.setState(newValue);
     currentPage.setState(1);
-    console.log('MIN PRICE AFTER SET', minPrice.state);
   };
 
   const handleMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -117,21 +76,13 @@ const Home = () => {
     fetch(`${CONFIG.API_URL}/expenses/category`)
       .then((res) => res.json())
       .then((resJson) => {
-        // console.log(resJson);
-        console.log('IDDDDD');
-
         resJson.forEach((element: CategoryResponseType) => {
           const index = categoryNames.indexOf(element.name);
-          // console.log(index, element.name, element.id);
           let temp = categoryIds;
 
           temp[index] = element.id;
           setCategoryIds(temp);
         });
-
-        console.log(categoryIds);
-
-        // console.log(categoryIds);
       });
   }, []);
 
@@ -140,7 +91,6 @@ const Home = () => {
       typeof paginationText == 'string' &&
       (paginationText == '<' || paginationText == '>')
     ) {
-      console.log('arrow');
       switch (paginationText) {
         case '<':
           currentPage.setState(currentPage.state - 1);
@@ -150,7 +100,6 @@ const Home = () => {
           break;
       }
     } else if (typeof paginationText == 'number') {
-      console.log('hello');
       currentPage.setState(paginationText);
     }
   };
@@ -173,7 +122,6 @@ const Home = () => {
         ) {
           paginationArray = [1, 2, '...', secondLastPage, firstLastPage];
         } else {
-          // paginationArray = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', secondLastPage, firstLastPage]
           paginationArray.push(1);
 
           if (currentPage.state - 1 != 2) {
@@ -224,7 +172,6 @@ const Home = () => {
           <button className='btn btn-dark pagination-btn text-center'>1</button>
         );
       } else {
-        console.log('PGINATION 5 KEBAWAH DAN BUKAN 1');
         const paginationArray = [];
 
         for (let i = 1; i <= expenseResponse.paging.pageCount; i++) {
@@ -266,8 +213,6 @@ const Home = () => {
       <div className='card-container'>
         {expenseArray && expenseArray.length > 0
           ? expenseArray.map((data) => {
-              // getExpenseName(data.id);
-
               return (
                 <Card
                   key={data.id}
@@ -278,11 +223,6 @@ const Home = () => {
               );
             })
           : null}
-
-        {/* <Card category='Food' name='Pizza' cost={50} />
-        <Card category='Food' name='Pizza' cost={50} />
-        <Card category='Food' name='Pizza' cost={50} />
-        <Card category='Food' name='Pizza' cost={50} /> */}
       </div>
 
       <TotalExpense />
@@ -307,23 +247,12 @@ const Home = () => {
                 break;
             }
 
-            console.log('HEHE', categoryIds[index], categoryIdSelect.state);
-
             if (categoryIds[index] == categoryIdSelect.state) {
-              console.log(
-                'SAMA',
-                categoryName,
-                categoryIds[index],
-                categoryIdSelect.state
-              );
-
               return (
                 <label
                   key={index}
                   className='form-check-label'
                   onClick={() => {
-                    // handleCheckbox(categoryName);
-                    console.log(categoryIds[index]);
                     categoryIdSelect.setState(categoryIds[index]);
                     currentPage.setState(1);
                   }}
@@ -338,15 +267,11 @@ const Home = () => {
                 </label>
               );
             } else {
-              console.log('HALOOOOOOOWWWWWWWWWWWWWWWWWW');
-
               return (
                 <label
                   key={index}
                   className='form-check-label'
                   onClick={() => {
-                    // handleCheckbox(categoryName);
-                    console.log(categoryIds[index]);
                     categoryIdSelect.setState(categoryIds[index]);
                     currentPage.setState(1);
                   }}
@@ -361,27 +286,6 @@ const Home = () => {
               );
             }
           })}
-
-          {/* <Checkbox
-            text='Housing'
-            categoryStatus={categoryStatus}
-            setCategoryStatus={setCategoryStatus}
-          />
-          <Checkbox
-            text='Food'
-            categoryStatus={categoryStatus}
-            setCategoryStatus={setCategoryStatus}
-          />
-          <Checkbox
-            text='Transportation'
-            categoryStatus={categoryStatus}
-            setCategoryStatus={setCategoryStatus}
-          />
-          <Checkbox
-            text='Personal Spending'
-            categoryStatus={categoryStatus}
-            setCategoryStatus={setCategoryStatus}
-          /> */}
         </div>
 
         <hr />
@@ -417,20 +321,6 @@ const Home = () => {
         {expenseResponse && expenseResponse.paging
           ? createPaginationFiveAndMore()
           : null}
-
-        {/* <button className='btn btn-light pagination-btn text-center'>
-          &lt;
-        </button>
-        <button className='btn btn-light pagination-btn text-center'>1</button>
-        <button className='btn btn-light pagination-btn text-center'>2</button>
-        <button className='btn btn-light pagination-btn text-center'>
-          ...
-        </button>
-        <button className='btn btn-light pagination-btn text-center'>5</button>
-        <button className='btn btn-light pagination-btn text-center'>6</button>
-        <button className='btn btn-light pagination-btn text-center'>
-          &gt;
-        </button> */}
       </div>
     </div>
   );

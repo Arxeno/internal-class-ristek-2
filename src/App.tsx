@@ -17,8 +17,6 @@ const App = () => {
           <Route path='/expense' element={<Home />} />
           <Route path='/expense/:expenseId' element={<ExpenseDetail />} />
         </Routes>
-        {/* <Home /> */}
-        {/* <ExpenseDetail expenseId='b0a396cf-0813-4ad6-bf61-246b0aa1b645' /> */}
       </div>
     </Router>
   );

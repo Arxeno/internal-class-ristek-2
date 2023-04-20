@@ -5,7 +5,6 @@ import { Link, useParams } from 'react-router-dom';
 
 const ExpenseDetail = () => {
   const { expenseId } = useParams();
-  console.log(expenseId);
 
   const [expenseData, setExpenseData] = useState(null);
   const [emoji, setEmoji] = useState('🛒');
@@ -31,7 +30,6 @@ const ExpenseDetail = () => {
         const timeZone = `${dateArray[6].replace('(', '')} ${
           dateArray[7]
         } ${dateArray[8].replace(')', '')}`;
-        console.log(timeZone);
         let hour: number | string = date.getHours();
         let minute: number | string = date.getMinutes();
         if (hour < 10) {
