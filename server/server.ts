@@ -142,6 +142,10 @@ app.get('/expense/category', (req: Request, res: Response) => {
   res.json(categoriesId);
 });
 
+app.get('/expense/total', (req: Request, res: Response) => {
+  res.json(currentExpense);
+});
+
 app.listen(port, () => {
   console.log(`Server is running at port ${port}`);
 });
