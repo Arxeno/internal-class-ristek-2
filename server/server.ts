@@ -197,6 +197,7 @@ app.post('/expense', (req: Request, res: Response) => {
   for (const categoryId of categoriesId2) {
     if (categoryId.id == body.category) {
       categoryName = categoryId.name;
+      break;
     }
   }
 
@@ -232,6 +233,12 @@ app.post('/expense', (req: Request, res: Response) => {
 app.delete('/expense/:id', (req: Request, res: Response) => {
   const { id } = req.params;
 
+  const deletedData = expensesData2.filter(
+    (currentValue) => currentValue.id == id
+  );
+
+  currentExpense2.total_expenses -= deletedData[0].amount;
+
   expensesData2 = expensesData2.filter((currentValue) => currentValue.id != id);
   expensesDetail2 = expensesDetail2.filter(
     (currentValue) => currentValue.id != id
@@ -244,6 +251,55 @@ app.delete('/expense/:id', (req: Request, res: Response) => {
   console.log(expensesData2);
   console.log('===============================================');
   console.log(expensesDetail2);
+});
+
+// PUT
+app.put('/expense/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const newData = req.body;
+
+  let oldData;
+  for (const expenseData of expensesData2) {
+    if (id == expenseData.id) {
+      oldData = expenseData;
+    }
+  }
+
+  expensesData2 = expensesData2.filter((currentValue) => currentValue.id != id);
+  expensesDetail2 = expensesDetail2.filter(
+    (currentValue) => currentValue.id != id
+  );
+
+  currentExpense2.total_expenses -= oldData ? oldData.amount : 0;
+  currentExpense2.total_expenses += newData.amount;
+
+  let categoryName = '';
+  for (const categoryId of categoriesId2) {
+    if (categoryId.id == newData.category) {
+      categoryName = categoryId.name;
+      break;
+    }
+  }
+
+  const newExpenseData = {
+    id: oldData ? oldData.id : '',
+    name: newData.name,
+    category: categoryName,
+    amount: newData.amount,
+  };
+  const newExpenseDetail = {
+    id: oldData ? oldData.id : '',
+    name: newData.name,
+    category: {
+      id: newData.category,
+      name: categoryName,
+    },
+    amount: newData.amount,
+  };
+
+  expensesData2.push(newExpenseData);
+  expensesDetail2.push(newExpenseDetail);
 });
 
 app.listen(port, () => {
