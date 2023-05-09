@@ -146,6 +146,22 @@ app.get('/expense/total', (req: Request, res: Response) => {
   res.json(currentExpense);
 });
 
+app.get('/expense/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  for (const expenseDetail of expensesDetail) {
+    if (id == expenseDetail.id) {
+      res.json(expenseDetail);
+      break;
+    }
+  }
+
+  res.status(500).json({
+    statusCode: 500,
+    message: 'Internal server error',
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server is running at port ${port}`);
 });
