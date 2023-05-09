@@ -8,6 +8,11 @@ import {
   expensesDetail,
 } from './data';
 
+let expensesData2 = expensesData;
+const categoriesId2 = categoriesId;
+const currentExpense2 = currentExpense;
+let expensesDetail2 = expensesDetail;
+
 dotenv.config();
 
 const app = express();
@@ -40,9 +45,9 @@ app.get('/expense', (req: Request<string | number>, res: Response) => {
 
   // search category name
   let categoryName = '';
-  for (let i = 0; i < categoriesId.length; i++) {
-    if (category_id == categoriesId[i].id) {
-      categoryName = categoriesId[i].name;
+  for (let i = 0; i < categoriesId2.length; i++) {
+    if (category_id == categoriesId2[i].id) {
+      categoryName = categoriesId2[i].name;
       break;
     }
   }
@@ -113,11 +118,11 @@ app.get('/expense', (req: Request<string | number>, res: Response) => {
 
   let itemCount = 0;
 
-  for (let i = 0; i < expensesData.length; i++) {
-    if (expensesData[i].category == categoryName || categoryName == '') {
-      if (minPriceNumber == -1 || expensesData[i].amount >= minPriceNumber) {
-        if (maxPriceNumber == -1 || expensesData[i].amount <= maxPriceNumber) {
-          dataFiltered.push(expensesData[i]);
+  for (let i = 0; i < expensesData2.length; i++) {
+    if (expensesData2[i].category == categoryName || categoryName == '') {
+      if (minPriceNumber == -1 || expensesData2[i].amount >= minPriceNumber) {
+        if (maxPriceNumber == -1 || expensesData2[i].amount <= maxPriceNumber) {
+          dataFiltered.push(expensesData2[i]);
           itemCount++;
         }
       }
@@ -155,17 +160,17 @@ app.get('/expense', (req: Request<string | number>, res: Response) => {
 });
 
 app.get('/expense/category', (req: Request, res: Response) => {
-  res.json(categoriesId);
+  res.json(categoriesId2);
 });
 
 app.get('/expense/total', (req: Request, res: Response) => {
-  res.json(currentExpense);
+  res.json(currentExpense2);
 });
 
 app.get('/expense/:id', (req: Request, res: Response) => {
   const { id } = req.params;
 
-  for (const expenseDetail of expensesDetail) {
+  for (const expenseDetail of expensesDetail2) {
     if (id == expenseDetail.id) {
       res.json(expenseDetail);
       break;
@@ -178,15 +183,18 @@ app.get('/expense/:id', (req: Request, res: Response) => {
   });
 });
 
+// POST
 app.post('/expense', (req: Request, res: Response) => {
   const { body } = req;
+
+  currentExpense2.total_expenses += body.amount;
 
   const newId = `${makeId(8)}-${makeId(4)}-${makeId(4)}-${makeId(4)}-${makeId(
     12
   )}`;
 
   let categoryName = '';
-  for (const categoryId of categoriesId) {
+  for (const categoryId of categoriesId2) {
     if (categoryId.id == body.category) {
       categoryName = categoryId.name;
     }
@@ -199,7 +207,7 @@ app.post('/expense', (req: Request, res: Response) => {
     amount: body.amount,
   };
 
-  expensesData.push(newExpenseData);
+  expensesData2.push(newExpenseData);
 
   const newExpenseDetail = {
     id: newId,
@@ -211,13 +219,31 @@ app.post('/expense', (req: Request, res: Response) => {
     amount: body.amount,
   };
 
-  expensesDetail.push(newExpenseDetail);
+  expensesDetail2.push(newExpenseDetail);
 
   res.json(newExpenseDetail);
 
-  console.log(expensesData);
+  console.log(expensesData2);
   console.log('=============================================');
-  console.log(expensesDetail);
+  console.log(expensesDetail2);
+});
+
+// DELETE
+app.delete('/expense/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  expensesData2 = expensesData2.filter((currentValue) => currentValue.id != id);
+  expensesDetail2 = expensesDetail2.filter(
+    (currentValue) => currentValue.id != id
+  );
+
+  res.send(
+    'Success delete expense with id fa8337a7-a4b7-4257-a322-9d51473d9fc3'
+  );
+
+  console.log(expensesData2);
+  console.log('===============================================');
+  console.log(expensesDetail2);
 });
 
 app.listen(port, () => {
