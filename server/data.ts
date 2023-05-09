@@ -81,7 +81,7 @@ export const categoriesId = [
 ];
 
 export const currentExpense = {
-  total_expenses: '344638',
+  total_expenses: 344638,
 };
 
 export const expensesDetail = [
