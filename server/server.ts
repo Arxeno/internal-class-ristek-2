@@ -138,6 +138,10 @@ app.get('/expense', (req: Request<string | number>, res: Response) => {
   res.json(result);
 });
 
+app.get('/expense/category', (req: Request, res: Response) => {
+  res.json(categoriesId);
+});
+
 app.listen(port, () => {
   console.log(`Server is running at port ${port}`);
 });
